@@ -1,6 +1,7 @@
 // src/pages/Todos.tsx
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 interface Todo {
   id: number;
@@ -12,6 +13,7 @@ const Todos = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
   const [newTodo, setNewTodo] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
   // Fetch todos from backend
@@ -30,9 +32,15 @@ const Todos = () => {
     }
   };
 
+
+  // Redirect to login if not logged in
   useEffect(() => {
-    fetchTodos();
-  }, []);
+    if (!token) {
+      navigate("/login");
+    } else {
+      fetchTodos(); // only fetch if token exists
+    }
+  }, [token]);
 
   // Add a new todo
   const addTodo = async () => {

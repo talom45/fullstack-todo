@@ -1,10 +1,10 @@
-import React, { useState } from "react";
-import axios from "axios";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import Spinner from "../components/Spinner";
 
-function Login() {
+export default function Login() {
   const navigate = useNavigate();
-
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -16,37 +16,26 @@ function Login() {
     setError("");
 
     try {
-      const res = await axios.post("http://127.0.0.1:8000/login", {
-        username,
-        password,
-      });
-
-      // Store token in localStorage
+      const res = await axios.post("http://127.0.0.1:8000/login", { username, password });
       localStorage.setItem("token", res.data.token);
-
-      navigate("/todos"); // redirect to todos page after login
+      navigate("/todos");
     } catch (err: any) {
-      if (err.response) {
-        setError(err.response.data.detail);
-      } else {
-        setError("Server error");
-      }
+      setError(err.response?.data?.detail || "Server error");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div style={{ padding: "2rem" }}>
+    <div className="form-container min-h-screen bg-gray-100 flex flex-col items-center justify-start pt-24">
       <h2>Login</h2>
-      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", width: "300px" }}>
+      <form onSubmit={handleSubmit} className="form-box">
         <input
           type="text"
           placeholder="Username"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           required
-          style={{ marginBottom: "1rem", padding: "0.5rem" }}
         />
         <input
           type="password"
@@ -54,15 +43,12 @@ function Login() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          style={{ marginBottom: "1rem", padding: "0.5rem" }}
         />
-        <button type="submit" disabled={loading} style={{ padding: "0.5rem" }}>
-          {loading ? "Logging in..." : "Login"}
+        <button type="submit" disabled={loading}>
+          {loading ? <Spinner /> : "Login"}
         </button>
+        {error && <p className="error">{error}</p>}
       </form>
-      {error && <p style={{ color: "red" }}>{error}</p>}
     </div>
   );
 }
-
-export default Login;

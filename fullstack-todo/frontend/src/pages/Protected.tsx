@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import Spinner from "../components/Spinner";
 
-function Protected() {
+export default function Protected() {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(true);
@@ -20,12 +21,10 @@ function Protected() {
         const res = await axios.get("http://127.0.0.1:8000/protected", {
           headers: { Authorization: `Bearer ${token}` },
         });
-
-        // Extract username from backend message: "Hello lom, you have accessed a protected route!"
         const message = res.data.message;
         const name = message.replace("Hello ", "").split(",")[0];
         setUsername(name);
-      } catch (err: any) {
+      } catch {
         setError("Unauthorized or server error");
         localStorage.removeItem("token");
         navigate("/login");
@@ -42,17 +41,14 @@ function Protected() {
     navigate("/login");
   };
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
+  if (loading) return <Spinner />;
+  if (error) return <p className="error">{error}</p>;
 
   return (
-    <div style={{ padding: "2rem" }}>
+    <div className="form-container">
       <h2>Welcome, {username}!</h2>
       <p>This is your protected page before seeing your tasks.</p>
-      <button onClick={handleLogout} style={{ marginTop: "1rem" }}>Logout</button>
+      <button onClick={handleLogout} className="logout">Logout</button>
     </div>
   );
 }
-
-export default Protected;
-

@@ -3,7 +3,8 @@ import Register from "./pages/Register";
 import Login from "./pages/Login";
 import Protected from "./pages/Protected";
 import Todos from "./pages/Todos";
-import React from "react";
+
+
 
 function App() {
   const navigate = useNavigate();
@@ -15,24 +16,28 @@ function App() {
   };
 
   return (
-    <div>
-      <nav style={{ padding: "1rem" }}>
-        {!token && (
+    <div className='mydiv'>
+      <nav className="mynav">
+        {!token ? (
           <>
-            <Link to="/register" style={{ marginRight: "1rem" }}>Register</Link>
-            <Link to="/login">Login</Link>
+            <Link to="/register" className="nav-link">Register</Link>
+            <Link to="/login" className="nav-link">Login</Link>
           </>
+        ) : (
+          <button onClick={handleLogout}>Logout</button>
         )}
-        {token && <button onClick={handleLogout}>Logout</button>}
       </nav>
 
-      <Routes>
-        <Route path="/register" element={<Register />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/protected" element={<Protected />} />
-        <Route path="/todos" element={<Todos />} />
-      </Routes>
+      <main style={{ padding: "2rem" }}>
+        <Routes>
+          <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/protected" element={<Protected />} />
+          <Route path="/todos" element={<Todos />} />
+        </Routes>
+      </main>
     </div>
+
   );
 }
 

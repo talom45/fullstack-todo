@@ -1,22 +1,22 @@
-// src/pages/Todos.tsx
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import Spinner from "../components/Spinner";
 
 interface Todo {
-  id: number;
+  id: string;
   title: string;
   done: boolean;
 }
 
-const Todos = () => {
-  const [todos, setTodos] = useState<Todo[]>([]);
-  const [newTodo, setNewTodo] = useState("");
-  const [loading, setLoading] = useState(false);
+export default function Todos() {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
-  // Fetch todos from backend
+  const [todos, setTodos] = useState<Todo[]>([]);
+  const [newTodo, setNewTodo] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const fetchTodos = async () => {
     if (!token) return;
     setLoading(true);
@@ -32,17 +32,14 @@ const Todos = () => {
     }
   };
 
-
-  // Redirect to login if not logged in
   useEffect(() => {
     if (!token) {
       navigate("/login");
     } else {
-      fetchTodos(); // only fetch if token exists
+      fetchTodos();
     }
   }, [token]);
 
-  // Add a new todo
   const addTodo = async () => {
     if (!newTodo.trim() || !token) return;
     try {
@@ -58,7 +55,6 @@ const Todos = () => {
     }
   };
 
-  // Toggle todo done/undone
   const toggleDone = async (todo: Todo) => {
     if (!token) return;
     try {
@@ -66,76 +62,52 @@ const Todos = () => {
       await axios.put(`http://127.0.0.1:8000/todos/${todo.id}`, updatedTodo, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      fetchTodos(); // refresh list
+      fetchTodos();
     } catch (err) {
       console.error(err);
     }
   };
 
-  // Delete a todo
-  const deleteTodo = async (id: number) => {
+  const deleteTodo = async (id: string) => {
     if (!token) return;
     try {
       await axios.delete(`http://127.0.0.1:8000/todos/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      fetchTodos(); // refresh list
+      fetchTodos();
     } catch (err) {
       console.error(err);
     }
   };
 
   return (
-    <div className="p-4 max-w-md mx-auto">
-      <h1 className="text-2xl font-bold mb-4">My Todos</h1>
-
-      {/* Add todo */}
-      <div className="flex mb-4">
+    <div className="todo-container">
+      <h2>My Todos</h2>
+      <div style={{ display: "flex", marginBottom: "1rem" }}>
         <input
           type="text"
-          className="border p-2 flex-1 mr-2"
+          placeholder="Add new todo"
           value={newTodo}
           onChange={(e) => setNewTodo(e.target.value)}
+          style={{ flex: 1, marginRight: "0.5rem", padding: "0.5rem" }}
         />
-        <button
-          onClick={addTodo}
-          className="bg-blue-500 text-white px-4 py-2 rounded"
-        >
-          Add
-        </button>
+        <button onClick={addTodo}>Add</button>
       </div>
-
-      {/* Loading */}
-      {loading && <p>Loading todos...</p>}
-
-      {/* List todos */}
-      <ul>
-        {todos.map((todo) => (
-          <li
-            key={todo.id}
-            className="border p-2 mb-2 flex justify-between items-center"
-          >
-            <span
-              style={{
-                textDecoration: todo.done ? "line-through" : "none",
-                cursor: "pointer",
-              }}
-              onClick={() => toggleDone(todo)}
-            >
-              {todo.title}
-            </span>
-            <button
-              onClick={() => deleteTodo(todo.id)}
-              className="bg-red-500 text-white px-2 py-1 rounded"
-            >
-              Delete
-            </button>
-          </li>
-        ))}
-      </ul>
+      {loading ? <Spinner /> : (
+        <ul className="todo-list">
+          {todos.map((todo) => (
+            <li key={todo.id}>
+              <span
+                className={todo.done ? "done" : ""}
+                onClick={() => toggleDone(todo)}
+              >
+                {todo.title}
+              </span>
+              <button onClick={() => deleteTodo(todo.id)}>Delete</button>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
-};
-
-export default Todos;
-
+}

@@ -23,12 +23,10 @@ function App() {
             <Link to="/register" className="nav-link">Register</Link>
             <Link to="/login" className="nav-link">Login</Link>
           </>
-        ) : (
-          <button onClick={handleLogout}>Logout</button>
-        )}
-      </nav>
+        ) : null}
+      </nav> 
 
-      <main style={{ padding: "2rem" }}>
+      <main>
         <Routes>
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />

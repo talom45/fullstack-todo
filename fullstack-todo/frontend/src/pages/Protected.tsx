@@ -36,11 +36,6 @@ export default function Protected() {
     fetchProtected();
   }, [navigate]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/login");
-  };
-
   if (loading) return <Spinner />;
   if (error) return <p className="error">{error}</p>;
 
@@ -48,7 +43,6 @@ export default function Protected() {
     <div className="form-container">
       <h2>Welcome, {username}!</h2>
       <p>This is your protected page before seeing your tasks.</p>
-      <button onClick={handleLogout} className="logout">Logout</button>
     </div>
   );
 }
